@@ -689,38 +689,65 @@
             
             // Toggle audio playback function
             function toggleAudioPlayback(audio, card) {
-                // If switching to a different track, reset the previous one
+                // If this is a different track than currently playing
                 if (currentAudio && currentAudio !== audio) {
+                    // Pause current audio
                     currentAudio.pause();
-                    currentAudio.currentTime = 0;
+                    // Reset UI for previous track
                     const currentPlayBtn = currentTrackCard.querySelector('.play-btn');
-                    const currentProgressBar = currentTrackCard.querySelector('.progress-bar');
-                    const currentTimeDisplay = currentTrackCard.querySelector('.time-display');
-                    
                     currentPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                    currentProgressBar.style.width = '0%';
-                    currentTimeDisplay.textContent = '0:00';
+                    
+                    // Set new current audio and card
+                    currentAudio = audio;
+                    currentTrackCard = card;
+                    
+                    // Play new audio from start
+                    audio.currentTime = 0;
+                    audio.play().catch(error => {
+                        console.error("Audio playback failed:", error);
+                        alert("Audio playback failed. Please check the console for details.");
+                    });
+                    
+                    // Update UI for new track
+                    card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+                    card.querySelector('.progress-bar').style.width = '0%';
+                    card.querySelector('.time-display').textContent = '0:00';
+                } 
+                // If this is the same track that's currently playing
+                else if (currentAudio === audio) {
+                    // If audio is playing, pause it
+                    if (!audio.paused) {
+                        audio.pause();
+                        card.querySelector('.play-btn').innerHTML = '<i class="fas fa-play"></i>';
+                        nowPlayingBar.classList.remove('active');
+                        return;
+                    } 
+                    // If audio is paused, resume playback
+                    else {
+                        audio.play().catch(error => {
+                            console.error("Audio playback failed:", error);
+                            alert("Audio playback failed. Please check the console for details.");
+                        });
+                        card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+                    }
                 }
-                
-                // If this audio is already playing, pause it
-                if (currentAudio === audio && !audio.paused) {
-                    audio.pause();
-                    card.querySelector('.play-btn').innerHTML = '<i class="fas fa-play"></i>';
-                    nowPlayingBar.classList.remove('active');
-                    return;
+                // If no audio is currently playing
+                else {
+                    currentAudio = audio;
+                    currentTrackCard = card;
+                    
+                    // Play audio from start
+                    audio.currentTime = 0;
+                    audio.play().catch(error => {
+                        console.error("Audio playback failed:", error);
+                        alert("Audio playback failed. Please check the console for details.");
+                    });
+                    
+                    // Update UI
+                    card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+                    card.querySelector('.progress-bar').style.width = '0%';
+                    card.querySelector('.time-display').textContent = '0:00';
                 }
-                
-                // Play this audio from start
-                audio.currentTime = 0;
-                audio.play().catch(error => {
-                    console.error("Audio playback failed:", error);
-                    alert("Audio playback failed. Please check the console for details.");
-                });
-                currentAudio = audio;
-                currentTrackCard = card;
-                card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
-                card.querySelector('.progress-bar').style.width = '0%';
-                card.querySelector('.time-display').textContent = '0:00';
                 
                 // Update now playing bar
                 const cover = card.querySelector('.track-cover').src;
