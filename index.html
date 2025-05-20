@@ -11,6 +11,11 @@
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         /* Font Face for MISQOT-Demi */
@@ -31,6 +36,7 @@
             min-height: 100vh;
             perspective: 1000px;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         /* Container */
@@ -191,6 +197,29 @@
             font-size: 20px;
         }
 
+        .rewind-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .rewind-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .rewind-btn:active {
+            transform: scale(0.9);
+        }
+
         .progress-container {
             flex-grow: 1;
             margin: 0 15px;
@@ -303,6 +332,12 @@
                 width: 45px;
                 height: 45px;
             }
+            
+            .rewind-btn {
+                width: 35px;
+                height: 35px;
+                margin-right: 5px;
+            }
         }
 
         /* Animations */
@@ -413,6 +448,15 @@
             cursor: pointer;
         }
 
+        .now-playing-rewind {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
         .close-now-playing {
             background: none;
             border: none;
@@ -444,6 +488,9 @@
                     <span class="track-date">Released: May 10</span>
                     
                     <div class="audio-controls">
+                        <button class="rewind-btn" title="Rewind to start">
+                            <i class="fas fa-redo"></i>
+                        </button>
                         <button class="play-btn">
                             <i class="fas fa-play"></i>
                         </button>
@@ -469,6 +516,9 @@
                     <span class="track-date">Released: May 16</span>
                     
                     <div class="audio-controls">
+                        <button class="rewind-btn" title="Rewind to start">
+                            <i class="fas fa-redo"></i>
+                        </button>
                         <button class="play-btn">
                             <i class="fas fa-play"></i>
                         </button>
@@ -501,6 +551,9 @@
             <div class="now-playing-artist">OLEHT9</div>
         </div>
         <div class="now-playing-controls">
+            <button class="now-playing-rewind" id="np-rewind" title="Rewind to start">
+                <i class="fas fa-redo"></i>
+            </button>
             <button class="now-playing-btn" id="np-prev"><i class="fas fa-step-backward"></i></button>
             <button class="now-playing-btn" id="np-play"><i class="fas fa-play"></i></button>
             <button class="now-playing-btn" id="np-next"><i class="fas fa-step-forward"></i></button>
@@ -510,6 +563,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Prevent context menu on long press
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+
             // Audio elements
             const audioElements = {};
             let currentAudio = null;
@@ -525,6 +583,7 @@
                 audioElements[audioSrc] = audio;
                 
                 const playBtn = card.querySelector('.play-btn');
+                const rewindBtn = card.querySelector('.rewind-btn');
                 const progressBar = card.querySelector('.progress-bar');
                 const progressContainer = card.querySelector('.progress-container');
                 const timeDisplay = card.querySelector('.time-display');
@@ -536,6 +595,16 @@
                 playBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     toggleAudioPlayback(audio, card);
+                });
+                
+                // Rewind to start functionality
+                rewindBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (audio === currentAudio) {
+                        audio.currentTime = 0;
+                        progressBar.style.width = '0%';
+                        timeDisplay.textContent = '0:00';
+                    }
                 });
                 
                 // Cover click - show fullscreen
@@ -611,8 +680,8 @@
                 
                 // Card click (play/pause)
                 card.addEventListener('click', function(e) {
-                    // Don't trigger if click was on volume control
-                    if (!e.target.closest('.volume-control')) {
+                    // Don't trigger if click was on volume control or rewind button
+                    if (!e.target.closest('.volume-control') && !e.target.closest('.rewind-btn')) {
                         toggleAudioPlayback(audio, card);
                     }
                 });
@@ -620,6 +689,19 @@
             
             // Toggle audio playback function
             function toggleAudioPlayback(audio, card) {
+                // If switching to a different track, reset the previous one
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    const currentPlayBtn = currentTrackCard.querySelector('.play-btn');
+                    const currentProgressBar = currentTrackCard.querySelector('.progress-bar');
+                    const currentTimeDisplay = currentTrackCard.querySelector('.time-display');
+                    
+                    currentPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    currentProgressBar.style.width = '0%';
+                    currentTimeDisplay.textContent = '0:00';
+                }
+                
                 // If this audio is already playing, pause it
                 if (currentAudio === audio && !audio.paused) {
                     audio.pause();
@@ -628,14 +710,8 @@
                     return;
                 }
                 
-                // Pause any currently playing audio
-                if (currentAudio && currentAudio !== audio) {
-                    currentAudio.pause();
-                    const currentPlayBtn = currentTrackCard.querySelector('.play-btn');
-                    currentPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                }
-                
-                // Play this audio
+                // Play this audio from start
+                audio.currentTime = 0;
                 audio.play().catch(error => {
                     console.error("Audio playback failed:", error);
                     alert("Audio playback failed. Please check the console for details.");
@@ -643,6 +719,8 @@
                 currentAudio = audio;
                 currentTrackCard = card;
                 card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+                card.querySelector('.progress-bar').style.width = '0%';
+                card.querySelector('.time-display').textContent = '0:00';
                 
                 // Update now playing bar
                 const cover = card.querySelector('.track-cover').src;
@@ -668,6 +746,14 @@
                         this.innerHTML = '<i class="fas fa-play"></i>';
                         currentTrackCard.querySelector('.play-btn').innerHTML = '<i class="fas fa-play"></i>';
                     }
+                }
+            });
+            
+            document.querySelector('#np-rewind').addEventListener('click', function() {
+                if (currentAudio) {
+                    currentAudio.currentTime = 0;
+                    currentTrackCard.querySelector('.progress-bar').style.width = '0%';
+                    currentTrackCard.querySelector('.time-display').textContent = '0:00';
                 }
             });
             
