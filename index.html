@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLEHT9 - Official Music</title>
+    <style>
+        /* CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        /* Font Face for MISQOT-Demi */
+        @font-face {
+            font-family: 'MISQOT-Demi';
+            src: url('!MISQOT-Demi.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Body Styles */
+        body {
+            background-image: url('фон-сайта.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: white;
+            min-height: 100vh;
+            perspective: 1000px;
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.6);
+            min-height: 100vh;
+            transform-style: preserve-3d;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+            transform: translateZ(20px);
+        }
+
+        .logo {
+            font-family: 'MISQOT-Demi', sans-serif;
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .telegram-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .telegram-icon:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+        }
+
+        /* Tracks Container */
+        .tracks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        /* Track Card */
+        .track-card {
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .track-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .track-card:active {
+            transform: translateY(-5px) scale(0.98);
+        }
+
+        .track-cover {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .track-cover:hover {
+            transform: scale(1.02);
+        }
+
+        .track-info {
+            padding: 20px;
+        }
+
+        .track-title {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .track-artist {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .track-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Audio Player Controls */
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .play-btn:hover::after {
+            opacity: 1;
+        }
+
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+
+        .play-btn i {
+            font-size: 20px;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            margin: 0 15px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            border-radius: 2px;
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-container:hover .progress-bar::after {
+            opacity: 1;
+        }
+
+        .time-display {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* Volume Control */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .volume-icon {
+            margin-right: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+        }
+
+        .volume-slider {
+            flex-grow: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .tracks-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .track-card {
+                max-width: 100%;
+            }
+            
+            .telegram-icon {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .track-cover {
+                height: 200px;
+            }
+            
+            .play-btn {
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Fullscreen Cover */
+        .cover-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .cover-fullscreen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .cover-fullscreen-img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-cover {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        /* Now Playing Indicator */
+        .now-playing {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .now-playing.active {
+            transform: translateY(0);
+        }
+
+        .now-playing-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 15px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .now-playing-info {
+            flex-grow: 1;
+        }
+
+        .now-playing-title {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .now-playing-artist {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .now-playing-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .now-playing-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .close-now-playing {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">OLEHT9</div>
+            <a href="https://t.me/lifescrut" target="_blank">
+                <img src="Telegram.jpg" alt="Telegram" class="telegram-icon pulse">
+            </a>
+        </header>
+
+        <div class="tracks-container">
+            <!-- Track 1 -->
+            <div class="track-card" data-audio="Дистония (prod 808quot, yomental).wav">
+                <img src="Твой-прах.png" alt="твой прах" class="track-cover">
+                <div class="track-info">
+                    <h3 class="track-title">твой прах</h3>
+                    <span class="track-artist">OLEHT9</span>
+                    <span class="track-date">Released: May 10</span>
+                    
+                    <div class="audio-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="progress-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <span class="time-display">0:00</span>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up volume-icon"></i>
+                        <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.7">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track 2 -->
+            <div class="track-card" data-audio="Бежал (prod 808quot, yomental).wav">
+                <img src="gbplf.png" alt="ТЦК" class="track-cover">
+                <div class="track-info">
+                    <h3 class="track-title">ТЦК</h3>
+                    <span class="track-artist">OLEHT9</span>
+                    <span class="track-date">Released: May 16</span>
+                    
+                    <div class="audio-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="progress-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <span class="time-display">0:00</span>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up volume-icon"></i>
+                        <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.7">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Cover -->
+    <div class="cover-fullscreen">
+        <img src="" alt="Fullscreen Cover" class="cover-fullscreen-img">
+        <button class="close-cover"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Now Playing Bar -->
+    <div class="now-playing">
+        <img src="" alt="Now Playing Cover" class="now-playing-cover">
+        <div class="now-playing-info">
+            <div class="now-playing-title"></div>
+            <div class="now-playing-artist">OLEHT9</div>
+        </div>
+        <div class="now-playing-controls">
+            <button class="now-playing-btn" id="np-prev"><i class="fas fa-step-backward"></i></button>
+            <button class="now-playing-btn" id="np-play"><i class="fas fa-play"></i></button>
+            <button class="now-playing-btn" id="np-next"><i class="fas fa-step-forward"></i></button>
+        </div>
+        <button class="close-now-playing"><i class="fas fa-times"></i></button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Audio elements
+            const audioElements = {};
+            let currentAudio = null;
+            let currentTrackCard = null;
+            const nowPlayingBar = document.querySelector('.now-playing');
+            const fullscreenCover = document.querySelector('.cover-fullscreen');
+            const fullscreenCoverImg = document.querySelector('.cover-fullscreen-img');
+            
+            // Initialize all audio elements
+            document.querySelectorAll('.track-card').forEach(card => {
+                const audioSrc = card.getAttribute('data-audio');
+                const audio = new Audio(audioSrc);
+                audioElements[audioSrc] = audio;
+                
+                const playBtn = card.querySelector('.play-btn');
+                const progressBar = card.querySelector('.progress-bar');
+                const progressContainer = card.querySelector('.progress-container');
+                const timeDisplay = card.querySelector('.time-display');
+                const volumeSlider = card.querySelector('.volume-slider');
+                const volumeIcon = card.querySelector('.volume-icon');
+                const trackCover = card.querySelector('.track-cover');
+                
+                // Play/Pause functionality
+                playBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleAudioPlayback(audio, card);
+                });
+                
+                // Cover click - show fullscreen
+                trackCover.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fullscreenCoverImg.src = this.src;
+                    fullscreenCover.classList.add('active');
+                });
+                
+                // Volume icon click - mute/unmute
+                volumeIcon.addEventListener('click', function() {
+                    if (audio.volume > 0) {
+                        audio.volume = 0;
+                        volumeSlider.value = 0;
+                        this.classList.remove('fa-volume-up');
+                        this.classList.add('fa-volume-mute');
+                    } else {
+                        audio.volume = volumeSlider.value;
+                        this.classList.add('fa-volume-up');
+                        this.classList.remove('fa-volume-mute');
+                    }
+                });
+                
+                // Progress bar update
+                audio.addEventListener('timeupdate', function() {
+                    if (audio === currentAudio) {
+                        const currentTime = audio.currentTime;
+                        const duration = audio.duration || 1;
+                        const progressPercent = (currentTime / duration) * 100;
+                        progressBar.style.width = `${progressPercent}%`;
+                        
+                        // Format time display
+                        const currentMinutes = Math.floor(currentTime / 60);
+                        const currentSeconds = Math.floor(currentTime % 60).toString().padStart(2, '0');
+                        timeDisplay.textContent = `${currentMinutes}:${currentSeconds}`;
+                        
+                        // Update now playing progress if this is the current track
+                        if (nowPlayingBar.classList.contains('active')) {
+                            document.querySelector('#np-play').innerHTML = audio.paused ? 
+                                '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+                        }
+                    }
+                });
+                
+                // Click on progress bar to seek
+                progressContainer.addEventListener('click', function(e) {
+                    const width = this.clientWidth;
+                    const clickX = e.offsetX;
+                    const duration = audio.duration;
+                    
+                    audio.currentTime = (clickX / width) * duration;
+                });
+                
+                // Volume control
+                volumeSlider.addEventListener('input', function() {
+                    audio.volume = this.value;
+                    if (this.value > 0) {
+                        volumeIcon.classList.add('fa-volume-up');
+                        volumeIcon.classList.remove('fa-volume-mute');
+                    } else {
+                        volumeIcon.classList.remove('fa-volume-up');
+                        volumeIcon.classList.add('fa-volume-mute');
+                    }
+                });
+                
+                // When audio ends
+                audio.addEventListener('ended', function() {
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    progressBar.style.width = '0%';
+                    timeDisplay.textContent = '0:00';
+                    nowPlayingBar.classList.remove('active');
+                });
+                
+                // Card click (play/pause)
+                card.addEventListener('click', function(e) {
+                    // Don't trigger if click was on volume control
+                    if (!e.target.closest('.volume-control')) {
+                        toggleAudioPlayback(audio, card);
+                    }
+                });
+            });
+            
+            // Toggle audio playback function
+            function toggleAudioPlayback(audio, card) {
+                // If this audio is already playing, pause it
+                if (currentAudio === audio && !audio.paused) {
+                    audio.pause();
+                    card.querySelector('.play-btn').innerHTML = '<i class="fas fa-play"></i>';
+                    nowPlayingBar.classList.remove('active');
+                    return;
+                }
+                
+                // Pause any currently playing audio
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    const currentPlayBtn = currentTrackCard.querySelector('.play-btn');
+                    currentPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+                
+                // Play this audio
+                audio.play().catch(error => {
+                    console.error("Audio playback failed:", error);
+                    alert("Audio playback failed. Please check the console for details.");
+                });
+                currentAudio = audio;
+                currentTrackCard = card;
+                card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+                
+                // Update now playing bar
+                const cover = card.querySelector('.track-cover').src;
+                const title = card.querySelector('.track-title').textContent;
+                
+                document.querySelector('.now-playing-cover').src = cover;
+                document.querySelector('.now-playing-title').textContent = title;
+                document.querySelector('#np-play').innerHTML = '<i class="fas fa-pause"></i>';
+                nowPlayingBar.classList.add('active');
+            }
+            
+            // Now playing controls
+            document.querySelector('#np-play').addEventListener('click', function() {
+                if (currentAudio) {
+                    if (currentAudio.paused) {
+                        currentAudio.play().catch(error => {
+                            console.error("Audio playback failed:", error);
+                        });
+                        this.innerHTML = '<i class="fas fa-pause"></i>';
+                        currentTrackCard.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        currentAudio.pause();
+                        this.innerHTML = '<i class="fas fa-play"></i>';
+                        currentTrackCard.querySelector('.play-btn').innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                }
+            });
+            
+            document.querySelector('#np-prev').addEventListener('click', function() {
+                if (currentTrackCard) {
+                    const prevCard = currentTrackCard.previousElementSibling;
+                    if (prevCard && prevCard.classList.contains('track-card')) {
+                        prevCard.querySelector('.play-btn').click();
+                    }
+                }
+            });
+            
+            document.querySelector('#np-next').addEventListener('click', function() {
+                if (currentTrackCard) {
+                    const nextCard = currentTrackCard.nextElementSibling;
+                    if (nextCard && nextCard.classList.contains('track-card')) {
+                        nextCard.querySelector('.play-btn').click();
+                    }
+                }
+            });
+            
+            document.querySelector('.close-now-playing').addEventListener('click', function() {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    document.querySelector('#np-play').innerHTML = '<i class="fas fa-play"></i>';
+                    if (currentTrackCard) {
+                        currentTrackCard.querySelector('.play-btn').innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                    nowPlayingBar.classList.remove('active');
+                }
+            });
+            
+            // Fullscreen cover controls
+            document.querySelector('.close-cover').addEventListener('click', function() {
+                fullscreenCover.classList.remove('active');
+            });
+            
+            fullscreenCover.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+            
+            // Now playing cover click - show fullscreen
+            document.querySelector('.now-playing-cover').addEventListener('click', function() {
+                if (this.src) {
+                    fullscreenCoverImg.src = this.src;
+                    fullscreenCover.classList.add('active');
+                }
+            });
+            
+            // iOS style hover effects
+            document.querySelectorAll('.play-btn, .track-card').forEach(el => {
+                el.addEventListener('touchstart', function() {
+                    this.classList.add('hover-effect');
+                });
+                
+                el.addEventListener('touchend', function() {
+                    this.classList.remove('hover-effect');
+                });
+            });
+            
+            // 3D tilt effect on cards
+            document.querySelectorAll('.track-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                    card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+                
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'all 0.1s ease';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
