@@ -534,6 +534,34 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Track 3 - Year War -->
+            <div class="track-card" data-audio="ГОД ВАЙНЫ.wav">
+                <img src="1000035011.jpg" alt="Year War" class="track-cover">
+                <div class="track-info">
+                    <h3 class="track-title">Year War</h3>
+                    <span class="track-artist">OLEHT9</span>
+                    <span class="track-date">prod. nudness</span>
+                    
+                    <div class="audio-controls">
+                        <button class="rewind-btn" title="Rewind to start">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="progress-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <span class="time-display">0:00</span>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up volume-icon"></i>
+                        <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.7">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -746,7 +774,7 @@
                     // Update UI
                     card.querySelector('.play-btn').innerHTML = '<i class="fas fa-pause"></i>';
                     card.querySelector('.progress-bar').style.width = '0%';
-                    card.querySelector('.time-display').textContent = '0:00';
+                    card.querySelector('.timeDisplay').textContent = '0:00';
                 }
                 
                 // Update now playing bar
